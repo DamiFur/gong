@@ -88,8 +88,8 @@ addToLine (Seq line gts) newLine = Seq (line++"\n"++(removeFirstNewLine newLine)
 addToLine t newLine = t
 
 getLineFromGT :: GoType -> String
-getLineFromGT (Send line _ _) = "SEND on line " ++ line
-getLineFromGT (Recv line _ _) = "RECV on line " ++ line
+getLineFromGT (Send line _ _) = (checkIfBuffer "SEND on line " line)
+getLineFromGT (Recv line _ _) = (checkIfBuffer "RECV on line " line)
 getLineFromGT (Tau line _) = if ((getTopOfLineNumberStack line)  /= "") then "TIMED event on line " ++ line else (getRestOfLineNumberStack line)
 getLineFromGT (IChoice line _ _) = line
 getLineFromGT (OChoice line _) = line
@@ -98,6 +98,10 @@ getLineFromGT (Close line _ _) = "Close operation on line " ++ line
 --getLineFromGT (TVar line _) = (getTopOfLineNumberStack line) ++ "CALL" ++ getRestOfLineNumberStack line
 --getLineFromGT (Seq line _) = (getTopOfLineNumberStack line) ++ "SEQ" ++ getRestOfLineNumberStack line
 getLineFromGT t = ""
+
+checkIfBuffer :: String -> String -> String
+checkIfBuffer op h1@('B':'U':'F':'F':'E':'R':restOfHistory) = h1
+checkIfBuffer op h2 = op ++ h2
 
 getLineFromSynched :: GoType -> GoType -> String
 getLineFromSynched (Send line _ _) t = "SEND on line " ++ (getTopOfLineNumberStack line) ++ "\n\t" ++ replaceNewLines (getLineFromGT t) ++ (getRestOfLineNumberStack line)
